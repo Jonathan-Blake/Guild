@@ -1,7 +1,7 @@
 package guild.adventurer;
 
 import guild.Guild;
-import guild.quest.QuestDifficulty;
+import guild.quest.QuestRank;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -22,7 +22,7 @@ class AdventurerRosterTest {
     @Test
     void assembleParty() {
         AdventurerRoster roster = spy(new AdventurerRoster(mockGuild));
-        final Adventurer hardGuy = Adventurer.randomise().preferredDifficulty(QuestDifficulty.HARD).build();
+        final Adventurer hardGuy = Adventurer.randomise().preferredDifficulty(QuestRank.HARD).build();
         List<Adventurer> allAdventurers = new ArrayList<>(List.of(
                 hardGuy,
                 Adventurer.randomise().build(),

@@ -1,8 +1,7 @@
 package guild.util;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.Random;
+import java.util.*;
+import java.util.function.Supplier;
 
 public class RandUtil {
 
@@ -34,7 +33,27 @@ public class RandUtil {
         return itr.next();
     }
 
+    public static <T> T pick(Map<T, Integer> weightedValues) {
+        int i = random.nextInt(weightedValues.values().stream().mapToInt(j -> j).sum());
+        for (Map.Entry<T, Integer> entry : weightedValues.entrySet()) {
+            i -= entry.getValue();
+            if (i <= 0) {
+                return entry.getKey();
+            }
+        }
+        throw new IllegalArgumentException("Logic got messed up");
+    }
+
     public static double nextDouble() {
         return random.nextDouble();
+    }
+
+    public static <T> List<T> randCountOf(Supplier<T> supplier, int bound) {
+        int count = random.nextInt(bound);
+        ArrayList<T> ret = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            ret.add(i, supplier.get());
+        }
+        return ret;
     }
 }

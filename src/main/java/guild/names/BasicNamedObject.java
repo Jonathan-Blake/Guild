@@ -1,4 +1,4 @@
-package guild;
+package guild.names;
 
 import guild.util.ListUtil;
 import guild.util.RandUtil;
@@ -8,47 +8,41 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class AbstractNamedObject {
+public abstract class BasicNamedObject extends BaseNamedObject {
     private static final EnumSet<ReplacementString> replacements = EnumSet.allOf(ReplacementString.class);
 
-    private final String name;
+    public static String replaceTemplatedStrings(String temp, Integer attempts, ReplacementString each) {
+        final String[] expansions = each.expansions();
+        if (attempts > 2) {
+            List<String> expansionsWithoutRecursion = ListUtil.removeIf(new ArrayList<>(List.of(each.expansions)), (replacementString -> replacementString.contains("[")));
+            if (expansionsWithoutRecursion.isEmpty()) {
+                temp = temp.replace(each.getSymbol(), RandUtil.pick(expansions));
+            } else {
+                temp = temp.replace(each.getSymbol(), RandUtil.pick(expansionsWithoutRecursion));
+            }
+        } else {
+            temp = temp.replace(each.getSymbol(), RandUtil.pick(expansions));
+        }
+        return temp;
+    }
 
-    protected AbstractNamedObject() {
+    @Override
+    protected String initName() {
         var ref = new Object() {
             String temp = getNameTemplate();
         };
         AtomicInteger attempts = new AtomicInteger();
-        while (replacements.stream().anyMatch(each -> ref.temp.contains(each.getSymbol()))) {
-            replacements.stream().filter(each -> ref.temp.contains(each.getSymbol())).forEach(each -> {
-                final String[] expansions = each.expansions();
-                if (attempts.get() > 2) {
-                    List<String> expansionsWithoutRecursion = ListUtil.removeIf(new ArrayList<>(List.of(each.expansions)), (replacementString -> replacementString.contains("[")));
-                    if (expansionsWithoutRecursion.isEmpty()) {
-                        ref.temp = ref.temp.replace(each.getSymbol(), RandUtil.pick(expansions));
-                    } else {
-                        ref.temp = ref.temp.replace(each.getSymbol(), RandUtil.pick(expansionsWithoutRecursion));
-                    }
-                } else {
-                    ref.temp = ref.temp.replace(each.getSymbol(), RandUtil.pick(expansions));
+        while (ref.temp.contains("[")) {
+            for (ReplacementString each : replacements) {
+                if (ref.temp.contains(each.getSymbol())) {
+                    ref.temp = replaceTemplatedStrings(ref.temp, attempts.get(), each);
                 }
-            });
+            }
             attempts.getAndIncrement();
         }
-        name = ref.temp;
+        return ref.temp;
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    @Override
-    public String toString() {
-        return super.toString() + " {" +
-                "name='" + name + '\'' +
-                '}';
-    }
-
-    public abstract String getNameTemplate();
 
     @SuppressWarnings("unused") // Enums are used internally based on the string
     public enum ReplacementString {

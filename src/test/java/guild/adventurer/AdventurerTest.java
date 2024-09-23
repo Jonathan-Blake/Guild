@@ -1,6 +1,6 @@
 package guild.adventurer;
 
-import guild.quest.QuestDifficulty;
+import guild.quest.QuestRank;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
@@ -86,20 +86,20 @@ class AdventurerTest {
         @Test
         void wouldAcceptSolo_Easy() {
             assertTrue(Adventurer.randomise()
-                    .preferredDifficulty(QuestDifficulty.VERYEASY)
+                    .preferredDifficulty(QuestRank.VERYEASY)
                     .build().wouldAccept(List.of()));
         }
 
         @Test
         void wouldNotAcceptSolo_Hard() {
             assertFalse(Adventurer.randomise()
-                    .preferredDifficulty(QuestDifficulty.NORMAL)
+                    .preferredDifficulty(QuestRank.NORMAL)
                     .build().wouldAccept(List.of()));
         }
 
         @Test
         void wouldAcceptDuo_Normal() {
-            final Adventurer adventurer = Adventurer.randomise().preferredDifficulty(QuestDifficulty.NORMAL).build();
+            final Adventurer adventurer = Adventurer.randomise().preferredDifficulty(QuestRank.NORMAL).build();
             assertFalse(adventurer.wouldAccept(List.of()));
             assertTrue(adventurer.wouldAccept(List.of(adventurer)));
         }

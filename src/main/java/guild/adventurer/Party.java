@@ -1,6 +1,7 @@
 package guild.adventurer;
 
-import guild.AbstractNamedObject;
+import guild.names.BaseNamedObject;
+import guild.names.WeightedNamedObject;
 import guild.quest.Quest;
 import guild.quest.QuestBoard;
 import guild.util.ListUtil;
@@ -8,12 +9,10 @@ import guild.util.RandUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class Party extends AbstractNamedObject {
+public class Party extends WeightedNamedObject {
     private static final Logger logger = LoggerFactory.getLogger(Party.class);
 
     private final List<Adventurer> members;
@@ -100,11 +99,22 @@ public class Party extends AbstractNamedObject {
 
     @Override
     public String getNameTemplate() {
-        return ReplacementString.PARTY.getSymbol();
+        return "{PARTY}";
     }
 
     public Quest currentQuest() {
         return currentQuest;
+    }
+
+    @Override
+    public Map<String, Map<String, Integer>> getContextMapping() {
+        Map<String, Map<String, Integer>> ret = super.getContextMapping();
+        ret.get("{NAME}").putAll(members.stream().collect(Collectors.toMap(
+                BaseNamedObject::getName,
+                member -> (50),
+                Integer::sum
+        )));
+        return ret;
     }
 
     public class QuestPlan {
@@ -119,7 +129,7 @@ public class Party extends AbstractNamedObject {
             dateEmbarked = currentDate;
             int maxTime = quest.expiryDate() - currentDate;
             final double partyPower1 = Party.this.partyPower();
-            final int expectedLengthForQuestType = quest.difficulty().getDifficulty();
+            final int expectedLengthForQuestType = quest.rank().getDifficulty();
             int estTime = (int) Math.ceil(expectedLengthForQuestType / partyPower1);
             double proportion;
             if (estTime <= maxTime) {
@@ -131,7 +141,7 @@ public class Party extends AbstractNamedObject {
                 questEffort = (int) (maxTime * partyPower1);
                 proportion = Math.pow(maxTime / (double) estTime, 3);
             }
-            if (questEffort < quest.difficulty().getDifficulty() - 5) {
+            if (questEffort < quest.rank().getDifficulty() - 5) {
                 preference = 0;
                 return;
             }
@@ -156,32 +166,33 @@ public class Party extends AbstractNamedObject {
                 s.append("But it was already completed");
             } else {
                 int attempt = (RandUtil.stdAround(10) - 10 + questEffort);
-                if (attempt > quest.difficulty().getDifficulty()) {
+                if (attempt > quest.rank().getDifficulty()) {
                     //Success
                     s.append("And had great success.");
                     Party.this.divideReward(quest.complete());
-                    Party.this.members.forEach(adventurer -> adventurer.gainExp(quest.difficulty().ordinal() + 1));
-                } else if (attempt > quest.difficulty().getDifficulty() - 3) {
+                    Party.this.members.forEach(adventurer -> adventurer.gainExp(quest.rank().ordinal() + 1));
+                } else if (attempt > quest.rank().getDifficulty() - 3) {
                     //Success with drawbacks
-                    Party.this.divideInjuries(quest.difficulty().injuries());
+                    Party.this.divideInjuries(quest.rank().injuries());
                     if (Party.this.members().isEmpty()) {
                         s.append("But died in the attempt.");
                     } else {
                         s.append("and succeeded despite injuries.");
                         Party.this.divideReward(quest.complete());
-                        Party.this.members.forEach(adventurer -> adventurer.gainExp(quest.difficulty().ordinal()));
+                        Party.this.members.forEach(adventurer -> adventurer.gainExp(quest.rank().ordinal()));
                     }
-                } else if (attempt > quest.difficulty().getDifficulty() - 5) {
+                } else if (attempt > quest.rank().getDifficulty() - 5) {
                     //Failure
                     s.append("and were rebuffed with injuries");
-                    Party.this.divideInjuries(quest.difficulty().injuries() + 1);
+                    Party.this.divideInjuries(quest.rank().injuries() + 1);
                 } else {
                     //TPK
                     s.append("but they were never heard from again.");
                     Party.this.roster.tpk(Party.this);
                 }
             }
-            logger.warn(String.valueOf(s));
+            final String s1 = String.valueOf(s);
+            logger.warn(s1);
             Party.this.currentQuest = null;
         }
 

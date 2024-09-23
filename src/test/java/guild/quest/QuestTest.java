@@ -30,7 +30,7 @@ class QuestTest {
                         Adventurer.randomise().build()
                 )),// Enough to guarentee complete?
                 null);
-        Quest q = Quest.randomQuest().notDifficulty(QuestDifficulty.HARD).notDifficulty(QuestDifficulty.LEGENDARY).notDifficulty(QuestDifficulty.NORMAL).build();
+        Quest q = Quest.randomQuest().notDifficulty(QuestRank.HARD).notDifficulty(QuestRank.LEGENDARY).notDifficulty(QuestRank.NORMAL).build();
 
         QuestBoard mockQB = mock(QuestBoard.class);
         when(mockQB.viewQuests()).thenReturn(List.of(q));

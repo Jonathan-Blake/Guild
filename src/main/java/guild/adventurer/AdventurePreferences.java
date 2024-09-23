@@ -1,7 +1,7 @@
 package guild.adventurer;
 
-import guild.quest.QuestDifficulty;
+import guild.quest.QuestRank;
 
 public class AdventurePreferences {
-    public QuestDifficulty difficulty;
+    public QuestRank difficulty;
 }

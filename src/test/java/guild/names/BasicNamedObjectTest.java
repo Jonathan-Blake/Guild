@@ -1,4 +1,4 @@
-package guild;
+package guild.names;
 
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -12,13 +12,14 @@ import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 
-class AbstractNamedObjectTest {
+class BasicNamedObjectTest {
 
-    private static final Logger logger = LoggerFactory.getLogger(AbstractNamedObjectTest.class);
+    private static final Logger logger = LoggerFactory.getLogger(BasicNamedObjectTest.class);
     private static final List<String> templates = List.of("TEST",
-            AbstractNamedObject.ReplacementString.ADVENTURER.getSymbol(),
-            AbstractNamedObject.ReplacementString.QUEST.getSymbol(),
-            AbstractNamedObject.ReplacementString.ITEM.getSymbol()
+            BasicNamedObject.ReplacementString.ADVENTURER.getSymbol(),
+            BasicNamedObject.ReplacementString.QUEST.getSymbol(),
+            BasicNamedObject.ReplacementString.ITEM.getSymbol(),
+            BasicNamedObject.ReplacementString.COLOUR.getSymbol()
     );
 
     static Stream<Arguments> getName() {
@@ -32,8 +33,8 @@ class AbstractNamedObjectTest {
         return ret.build().flatMap(each -> each);
     }
 
-    private static AbstractNamedObject getAbstractNamedObjectFromTemplate(String template) {
-        return new AbstractNamedObject() {
+    private static BasicNamedObject getAbstractNamedObjectFromTemplate(String template) {
+        return new BasicNamedObject() {
             @Override
             public String getNameTemplate() {
                 return template;
@@ -43,7 +44,7 @@ class AbstractNamedObjectTest {
 
     @ParameterizedTest
     @MethodSource
-    void getName(String template, AbstractNamedObject a) {
+    void getName(String template, BasicNamedObject a) {
         assertEquals(template, a.getNameTemplate());
         logger.info(a.getName());
         assertFalse(a.getName().contains("["));

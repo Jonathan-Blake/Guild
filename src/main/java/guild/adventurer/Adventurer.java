@@ -1,12 +1,12 @@
 package guild.adventurer;
 
-import guild.AbstractNamedObject;
+import guild.names.BasicNamedObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class Adventurer extends AbstractNamedObject {
+public class Adventurer extends BasicNamedObject {
     private static final Logger logger = LoggerFactory.getLogger(Adventurer.class);
     private final AdventurePreferences preferences;
     private int power;

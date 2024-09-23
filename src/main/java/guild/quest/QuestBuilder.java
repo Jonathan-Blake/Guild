@@ -6,20 +6,20 @@ import java.util.EnumSet;
 
 public class QuestBuilder {
     private int startDate;
-    private EnumSet<QuestDifficulty> possibleDifficulties = EnumSet.allOf(QuestDifficulty.class);
+    private EnumSet<QuestRank> possibleDifficulties = EnumSet.allOf(QuestRank.class);
 
     public QuestBuilder fromDate(int day) {
         this.startDate = day;
         return this;
     }
 
-    public QuestBuilder notDifficulty(QuestDifficulty difficulty) {
+    public QuestBuilder notDifficulty(QuestRank difficulty) {
         this.possibleDifficulties.remove(difficulty);
         return this;
     }
 
     public Quest build() {
-        QuestDifficulty difficulty = RandUtil.pick(possibleDifficulties);
+        QuestRank difficulty = RandUtil.pick(possibleDifficulties);
         return new Quest(startDate + RandUtil.stdAround(difficulty.getExpectedLength()), difficulty);
     }
 }

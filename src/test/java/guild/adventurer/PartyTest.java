@@ -46,7 +46,7 @@ class PartyTest {
         assertFalse(p.isUnassigned());
         assertEquals(1, q.viewQuests().stream().mapToInt(each -> {
             if (each.isQuestAccepted()) {
-                System.out.println("Accepted Quest " + each + each.difficulty());
+                System.out.println("Accepted Quest " + each + each.rank());
                 return 1;
             }
             return 0;

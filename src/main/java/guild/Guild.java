@@ -28,7 +28,7 @@ public class Guild {
             //DayStart
             g.newDay();
             //
-            g.assignQuests();
+            g.selectDaytimeActivity();
             //Day End
             g.endDay();
         }
@@ -41,7 +41,7 @@ public class Guild {
         adventurerRoster.mergeOrSplitParties();
     }
 
-    private void assignQuests() {
+    private void selectDaytimeActivity() {
         List<Party> parties = adventurerRoster.getUnassignedParties();
         parties.forEach(party -> party.selectQuest(questBoard, day));
     }

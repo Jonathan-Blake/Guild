@@ -1,29 +1,27 @@
 package guild.quest;
 
-import guild.AbstractNamedObject;
 import guild.adventurer.Party;
+import guild.names.WeightedNamedObject;
 import guild.util.RandUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
-public class Quest extends AbstractNamedObject {
+public class Quest extends WeightedNamedObject {
     private static final Logger logger = LoggerFactory.getLogger(Quest.class);
 
     final int expiryDate;
-    private final QuestDifficulty difficulty;
+    private final QuestRank rank;
     private int reward;
     private HashMap<Integer, List<Party.QuestPlan>> contractsAccepted;
     private boolean completed = false;
 
-    public Quest(int expiryDate, QuestDifficulty difficulty) {
+    public Quest(int expiryDate, QuestRank rank) {
         this.expiryDate = expiryDate;
-        this.difficulty = difficulty;
-        this.reward = RandUtil.stdAround(difficulty.getDifficulty());
+        this.rank = rank;
+        this.reward = RandUtil.stdAround(rank.getDifficulty());
         contractsAccepted = new HashMap<>();
     }
 
@@ -35,8 +33,8 @@ public class Quest extends AbstractNamedObject {
         return expiryDate;
     }
 
-    public QuestDifficulty difficulty() {
-        return difficulty;
+    public QuestRank rank() {
+        return rank;
     }
 
     public int reward() {
@@ -78,10 +76,37 @@ public class Quest extends AbstractNamedObject {
 
     @Override
     public String getNameTemplate() {
-        return ReplacementString.QUEST.getSymbol();
+        return "{QUEST}";
     }
 
     public int earliestAttemptDate() {
         return contractsAccepted.keySet().stream().mapToInt(i -> i).min().orElse(0);
+    }
+
+
+    @Override
+    public Map<String, Map<String, Integer>> getContextMapping() {
+        Map<String, Map<String, Integer>> ret = super.getContextMapping();
+        ret.get("{MONSTER}").putAll(QuestRank.getMonstersForRank(rank).stream().collect(Collectors.toMap(
+                string -> string,
+                member -> (25),
+                Integer::sum
+        )));
+        ret.get("{ITEM_DESCRIPTOR}").putAll(QuestRank.getItemsForRank(rank).stream().collect(Collectors.toMap(
+                string -> string,
+                member -> (15),
+                Integer::sum
+        )));
+        ret.get("{MATERIAL_DESCRIPTOR}").putAll(QuestRank.getMaterialsForRank(rank).stream().collect(Collectors.toMap(
+                string -> string,
+                member -> (15),
+                Integer::sum
+        )));
+        ret.get("{GROUP_DESCRIPTOR}").putAll(QuestRank.getGroupForRank(rank).stream().collect(Collectors.toMap(
+                string -> string,
+                member -> (15),
+                Integer::sum
+        )));
+        return ret;
     }
 }
