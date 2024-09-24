@@ -29,15 +29,15 @@ public enum QuestRank {
 
     public static List<String> getItemsForRank(QuestRank rank) {
         return switch (rank) {
-            case VERYEASY, NORMAL -> List.of("Broken", "Iron", "{NAME}'s", "Lost");
-            case HARD, LEGENDARY -> List.of("{ITEM_DESCRIPTOR} {ITEM_DESCRIPTOR}", "Huge");
+            case VERYEASY, NORMAL -> List.of("Broken", "Iron", "[NAME]'s", "Lost");
+            case HARD, LEGENDARY -> List.of("[ITEM_DESCRIPTOR] [ITEM_DESCRIPTOR]", "Huge");
         };
     }
 
     public static List<String> getMaterialsForRank(QuestRank rank) {
         return switch (rank) {
             case VERYEASY, NORMAL -> List.of("Iron");
-            case HARD, LEGENDARY -> List.of("{MATERIAL_DESCRIPTOR} {ITEM_DESCRIPTOR}", "Sapphire", "Rare");
+            case HARD, LEGENDARY -> List.of("[MATERIAL_DESCRIPTOR] [ITEM_DESCRIPTOR]", "Sapphire", "Rare");
         };
     }
 

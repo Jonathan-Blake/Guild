@@ -57,7 +57,8 @@ class WeightedNamedObjectTest {
                 }
             });
         }
+        assertFalse(a.getName().contains("["));
+        assertFalse(a.getName().contains("]"));
         assertFalse(a.getName().contains("{"));
-        assertFalse(a.getName().contains("}"));
     }
 }

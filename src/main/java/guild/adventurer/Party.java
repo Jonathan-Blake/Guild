@@ -1,6 +1,7 @@
 package guild.adventurer;
 
 import guild.names.BaseNamedObject;
+import guild.names.BasicNamedObject;
 import guild.names.WeightedNamedObject;
 import guild.quest.Quest;
 import guild.quest.QuestBoard;
@@ -99,7 +100,7 @@ public class Party extends WeightedNamedObject {
 
     @Override
     public String getNameTemplate() {
-        return "{PARTY}";
+        return BasicNamedObject.ReplacementString.PARTY.getSymbol();
     }
 
     public Quest currentQuest() {
@@ -109,7 +110,7 @@ public class Party extends WeightedNamedObject {
     @Override
     public Map<String, Map<String, Integer>> getContextMapping() {
         Map<String, Map<String, Integer>> ret = super.getContextMapping();
-        ret.get("{NAME}").putAll(members.stream().collect(Collectors.toMap(
+        ret.get("[NAME]").putAll(members.stream().collect(Collectors.toMap(
                 BaseNamedObject::getName,
                 member -> (50),
                 Integer::sum

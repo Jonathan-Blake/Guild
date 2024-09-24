@@ -1,6 +1,7 @@
 package guild.quest;
 
 import guild.adventurer.Party;
+import guild.names.BasicNamedObject;
 import guild.names.WeightedNamedObject;
 import guild.util.RandUtil;
 import org.slf4j.Logger;
@@ -74,35 +75,34 @@ public class Quest extends WeightedNamedObject {
         return tmp;
     }
 
-    @Override
-    public String getNameTemplate() {
-        return "{QUEST}";
-    }
-
     public int earliestAttemptDate() {
         return contractsAccepted.keySet().stream().mapToInt(i -> i).min().orElse(0);
     }
 
+    @Override
+    public String getNameTemplate() {
+        return BasicNamedObject.ReplacementString.QUEST.getSymbol();
+    }
 
     @Override
     public Map<String, Map<String, Integer>> getContextMapping() {
         Map<String, Map<String, Integer>> ret = super.getContextMapping();
-        ret.get("{MONSTER}").putAll(QuestRank.getMonstersForRank(rank).stream().collect(Collectors.toMap(
+        ret.get("[MONSTER]").putAll(QuestRank.getMonstersForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (25),
                 Integer::sum
         )));
-        ret.get("{ITEM_DESCRIPTOR}").putAll(QuestRank.getItemsForRank(rank).stream().collect(Collectors.toMap(
+        ret.get("[ITEM_DESCRIPTOR]").putAll(QuestRank.getItemsForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (15),
                 Integer::sum
         )));
-        ret.get("{MATERIAL_DESCRIPTOR}").putAll(QuestRank.getMaterialsForRank(rank).stream().collect(Collectors.toMap(
+        ret.get("[MATERIAL_DESCRIPTOR]").putAll(QuestRank.getMaterialsForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (15),
                 Integer::sum
         )));
-        ret.get("{GROUP_DESCRIPTOR}").putAll(QuestRank.getGroupForRank(rank).stream().collect(Collectors.toMap(
+        ret.get("[GROUP_DESCRIPTOR]").putAll(QuestRank.getGroupForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (15),
                 Integer::sum

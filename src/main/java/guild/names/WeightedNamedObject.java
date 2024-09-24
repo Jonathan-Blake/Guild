@@ -4,7 +4,6 @@ import guild.util.RandUtil;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public abstract class WeightedNamedObject extends BaseNamedObject {
 
@@ -14,23 +13,21 @@ public abstract class WeightedNamedObject extends BaseNamedObject {
 
     @Override
     protected String initName() {
-        final String[] temp = {getNameTemplate()};
+        String temp = getNameTemplate();
         Map<String, Map<String, Integer>> contextMapping = getContextMapping();
-        while (temp[0].contains("{")) {
-            AtomicBoolean replaced = new AtomicBoolean(false);
-            contextMapping.keySet().forEach(
-                    key -> {
-                        if (temp[0].contains(key)) {
-                            temp[0] = WeightedNamedObject.replaceTemplatedStrings(temp[0], contextMapping, key);
-                            replaced.set(true);
-                        }
-                    }
-            );
-            if (!replaced.get()) {
-                throw new IllegalArgumentException("Failed to replace Weighted String " + temp[0]);
+        while (temp.contains("[")) {
+            boolean replaced = (false);
+            for (String key : contextMapping.keySet()) {
+                if (temp.contains(key)) {
+                    temp = WeightedNamedObject.replaceTemplatedStrings(temp, contextMapping, key);
+                    replaced = (true);
+                }
+            }
+            if (!replaced) {
+                throw new IllegalArgumentException("Failed to replace Weighted String " + temp);
             }
         }
-        return temp[0];
+        return temp;
     }
 
     public Map<String, Map<String, Integer>> getContextMapping() {
@@ -38,9 +35,9 @@ public abstract class WeightedNamedObject extends BaseNamedObject {
         for (BasicNamedObject.ReplacementString value : BasicNamedObject.ReplacementString.values()) {
             HashMap<String, Integer> weights = new HashMap<>();
             for (String expansion : value.expansions()) {
-                weights.put(expansion.replace("[", "{").replace("]", "}"), 10);
+                weights.put(expansion, 10);
             }
-            ret.put("{" + value.name() + "}", weights);
+            ret.put(value.getSymbol(), weights);
         }
 
         return ret;
