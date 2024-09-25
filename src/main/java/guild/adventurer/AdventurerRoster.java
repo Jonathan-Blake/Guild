@@ -41,7 +41,13 @@ public class AdventurerRoster {
     }
 
     public void mergeOrSplitParties() {
-        getUnassignedPartiesStream().forEach(Party::checkDisband);
+        ArrayList<Party> partiesToDisband = new ArrayList<>();
+        getUnassignedPartiesStream().forEach(party -> {
+            if (party.checkDisband()) {
+                partiesToDisband.add(party);
+            }
+        });
+        partiesToDisband.forEach(this::disband);
         List<Adventurer> heroesToParty = new ArrayList<>(adventurers.stream().filter(Adventurer::outOfParty).toList());
         while (assembleParty(new ArrayList<>(), heroesToParty)) {
             final Party party = parties.get(parties.size() - 1);
@@ -106,5 +112,13 @@ public class AdventurerRoster {
 
     public void rest() {
         getMembers().forEach(Adventurer::rest);
+    }
+
+    public void disband(Party party) {
+        logger.warn("{} disbanded.", party);
+        for (Adventurer member : party.members()) {
+            member.setParty(null);
+        }
+        parties.remove(party);
     }
 }

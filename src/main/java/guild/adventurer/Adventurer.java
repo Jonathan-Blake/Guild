@@ -4,6 +4,7 @@ import guild.names.BasicNamedObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Adventurer extends BasicNamedObject {
@@ -35,7 +36,22 @@ public class Adventurer extends BasicNamedObject {
         int partyPower = this.power;
         partyPower += otherMembers.stream().mapToInt(each -> each.power).sum();
         //Party is sufficiently Strong
-        return (partyPower * preferences.difficulty.getExpectedLength() + partyDesperation >= preferences.difficulty.getDifficulty());
+        final int expectedPower = partyPower * preferences.difficulty.getExpectedLength();
+        int initialAcceptance = expectedPower - preferences.difficulty.getDifficulty();
+        ArrayList<String> reasons = new ArrayList<>();
+        reasons.add("%s considered party of %s at rating %s".formatted(this, otherMembers, initialAcceptance));
+        if (initialAcceptance < 0) {
+            reasons.add("party was under desired strength.");
+        }
+        if (getParty() == null) {
+            initialAcceptance += partyDesperation;
+            reasons.add("desperate for a party %s.".formatted(partyDesperation));
+        } else {
+            initialAcceptance += getParty().partyMorale();
+            reasons.add("party morale was %s".formatted(getParty().partyMorale()));
+        }
+        logger.debug("{}", reasons);
+        return initialAcceptance >= 0;
     }
 
     public int level() {

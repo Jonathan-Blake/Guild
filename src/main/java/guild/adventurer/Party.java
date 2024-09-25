@@ -19,12 +19,14 @@ public class Party extends WeightedNamedObject {
     private final List<Adventurer> members;
     private final AdventurerRoster roster;
     private Quest currentQuest;
+    private int partyMorale;
 
     public Party(List<Adventurer> proposedParty, AdventurerRoster roster) {
         super();
         members = proposedParty;
         this.roster = roster;
         proposedParty.forEach(each -> each.setParty(this));
+        partyMorale = 3;
     }
 
     public static boolean wouldAccept(List<Adventurer> proposedParty) {
@@ -57,11 +59,12 @@ public class Party extends WeightedNamedObject {
         return currentQuest == null;
     }
 
-    public void checkDisband() {
-        //TODO: Implement this
+    public boolean checkDisband() {
+        return !wouldAccept(members);
     }
 
     public void divideReward(int amount) {
+        this.partyMorale += currentQuest.rank().ordinal() + 1;
         int remainder = amount % members.size();
         int split = amount / members.size();
         members.forEach(each -> each.gainReward(split));
@@ -76,22 +79,27 @@ public class Party extends WeightedNamedObject {
     }
 
     public void divideInjuries(int injuries) {
+        this.partyMorale -= injuries;
         for (int i = 0; i < injuries; i++) {
+            if (members.isEmpty()) {
+                logger.warn("{} was wiped out due to injuries.", this);
+                return;
+            }
             final Adventurer pick = RandUtil.pick(members);
             assert !pick.isDead();
             pick.injure();
             if (pick.isDead()) {
                 roster.kill(pick);
-                if (members.isEmpty()) {
-                    logger.warn("{} was wiped out due to injuries.", this);
-                    return;
-                }
             }
         }
     }
 
     public int partyPower() {
         return members.stream().mapToInt(Adventurer::level).sum();
+    }
+
+    public int partyMorale() {
+        return this.partyMorale;
     }
 
     public Collection<Adventurer> members() {
@@ -123,6 +131,7 @@ public class Party extends WeightedNamedObject {
         private final Quest quest;
         private final Integer completionDate;
         private final int questEffort;
+        @SuppressWarnings(value = "unused")
         private final int dateEmbarked;
 
         public QuestPlan(Quest quest, int currentDate) {
