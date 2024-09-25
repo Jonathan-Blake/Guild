@@ -48,7 +48,7 @@ public class QuestBoard {
         }
     }
 
-    public void checkCompletedQuests(int day) {
+    public void resolveAcceptedQuestsForCompletion(int day) {
         viewQuests().stream().filter(Quest::isQuestAccepted).forEach(quest -> quest.resolve(day));
     }
 

@@ -6,7 +6,12 @@ import guild.util.RandUtil;
 import java.util.EnumSet;
 
 public class AdventurerBuilder {
-    private final AdventurePreferences preferences = new AdventurePreferences();
+    private final AdventurePreferences preferences;
+
+    public AdventurerBuilder(int date) {
+        preferences = new AdventurePreferences();
+        preferences.creationDate = date;
+    }
 
     public AdventurerBuilder preferredDifficulty(QuestRank difficulty) {
         preferences.difficulty = difficulty;

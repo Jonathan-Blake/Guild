@@ -16,6 +16,15 @@ class QuestBoardTest {
         assertTrue(questBoard.quests.isEmpty());
     }
 
+    @Test
+    void removeCompletedQuests() {
+        QuestBoard questBoard = new QuestBoard();
+        questBoard.generateNewQuests(0);
+        questBoard.quests.forEach(Quest::complete);
+        questBoard.removeOldQuests(0);
+        assertTrue(questBoard.quests.isEmpty());
+    }
+
     @Nested
     class generateNewQuests {
         private final int day = 0;

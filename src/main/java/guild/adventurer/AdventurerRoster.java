@@ -7,14 +7,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 public class AdventurerRoster {
     private static final Logger logger = LoggerFactory.getLogger(AdventurerRoster.class);
 
     private final Guild guild;
-    private List<Party> parties;
-    private List<Adventurer> adventurers;
+    protected final List<Adventurer> adventurers;
+    private final List<Party> parties;
 
     public AdventurerRoster(Guild guild) {
         this.guild = guild;
@@ -30,12 +31,12 @@ public class AdventurerRoster {
         return this.parties.stream().filter(Party::isUnassigned);
     }
 
-    public void generateNewHeros() {
+    public void generateNewHeros(int currDate) {
         for (int i = 0; i < 10; i++) {
-            int chance = adventurers.size() * 10 - 100;
+            int chance = getMembers().size() * 10 - 100;
             if (RandUtil.probabilityRoll(chance)) {
-                final Adventurer adventurer = Adventurer.randomise().build();
-                adventurers.add(adventurer);
+                final Adventurer adventurer = Adventurer.randomise(currDate).build();
+                getMembers().add(adventurer);
             }
         }
     }
@@ -48,7 +49,7 @@ public class AdventurerRoster {
             }
         });
         partiesToDisband.forEach(this::disband);
-        List<Adventurer> heroesToParty = new ArrayList<>(adventurers.stream().filter(Adventurer::outOfParty).toList());
+        List<Adventurer> heroesToParty = new ArrayList<>(getMembers().stream().filter(Adventurer::outOfParty).toList());
         while (assembleParty(new ArrayList<>(), heroesToParty)) {
             final Party party = parties.get(parties.size() - 1);
             logger.info("Created new party {} {}", party, party.members());
@@ -76,7 +77,7 @@ public class AdventurerRoster {
     }
 
     public int heroCount() {
-        return adventurers.size();
+        return getMembers().size();
     }
 
     public List<Party> getParties() {
@@ -84,7 +85,7 @@ public class AdventurerRoster {
     }
 
     public Stream<Adventurer> unpartiedHeroesStream() {
-        return adventurers.stream().filter(Adventurer::outOfParty);
+        return getMembers().stream().filter(Adventurer::outOfParty);
     }
 
     public long unpartiedHeroesCount() {
@@ -93,17 +94,14 @@ public class AdventurerRoster {
 
     public void tpk(Party members) {
         this.parties.remove(members);
-        this.adventurers.removeAll(members.members());
+        this.getMembers().removeAll(members.members());
     }
 
     public void kill(Adventurer pick) {
-        this.adventurers.remove(pick);
+        this.getMembers().remove(pick);
         final Party party = pick.getParty();
-        party.members().remove(pick);
-        if (party.members().isEmpty()) {
-            this.parties.remove(party);
-        }
         logger.warn("{} died in the attempt of guild.quest {}.", pick, party.currentQuest());
+        party.removeMember(pick);
     }
 
     public List<Adventurer> getMembers() {
@@ -116,9 +114,41 @@ public class AdventurerRoster {
 
     public void disband(Party party) {
         logger.warn("{} disbanded.", party);
-        for (Adventurer member : party.members()) {
-            member.setParty(null);
+        for (Adventurer member : new ArrayList<>(party.members())) {
+            party.removeMember(member);
         }
         parties.remove(party);
+    }
+
+    public int collectDues(final int day, final int amount) {
+        AtomicInteger amountCollected = new AtomicInteger();
+        List<Adventurer> cantPay = new ArrayList<>();
+        getUnassignedPartiesStream()
+                .flatMap(party -> party.members().stream())
+                .filter(adventurer -> day > adventurer.getDuesDateOwed())
+                .forEach(
+                        adventurer -> amountCollected.addAndGet(
+                                chargeDues(day, amount, cantPay, adventurer))
+                );
+        cantPay.forEach(each -> {
+            logger.info("{} can't pay their dues and quit.", each);
+            each.getParty().removeMember(each);
+            getMembers().remove(each);
+        });
+        return amountCollected.get();
+    }
+
+    private int chargeDues(int day, int amount, List<Adventurer> cantPay, Adventurer adventurer) {
+        int ret = 0;
+        while (day > adventurer.getDuesDateOwed()) {
+            if (!adventurer.charge(amount)) {
+                cantPay.add(adventurer);
+                break;
+            } else {
+                ret += (amount);
+                adventurer.setDuesDateOwed(adventurer.getDuesDateOwed() + 7);
+            }
+        }
+        return ret;
     }
 }

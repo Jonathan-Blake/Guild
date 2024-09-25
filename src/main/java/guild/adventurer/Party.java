@@ -64,7 +64,7 @@ public class Party extends WeightedNamedObject {
     }
 
     public void divideReward(int amount) {
-        this.partyMorale += currentQuest.rank().ordinal() + 1;
+        this.partyMorale += currentQuest().rank().ordinal() + 1;
         int remainder = amount % members.size();
         int split = amount / members.size();
         members.forEach(each -> each.gainReward(split));
@@ -126,6 +126,17 @@ public class Party extends WeightedNamedObject {
         return ret;
     }
 
+    void removeMember(Adventurer adventurer) {
+        assert members.contains(adventurer);
+        assert adventurer.getParty() == this;
+        members.remove(adventurer);
+        adventurer.setParty(null);
+        if (members.isEmpty()) {
+            logger.info("{} disbanded due to lack of members.", this);
+            roster.getParties().remove(this);
+        }
+    }
+
     public class QuestPlan {
         private final double preference;
         private final Quest quest;
@@ -162,7 +173,7 @@ public class Party extends WeightedNamedObject {
         }
 
         public void embark(Party party) {
-            quest.accept(this, completionDate);
+            quest.accept(this);
             party.currentQuest = quest;
         }
 
@@ -212,6 +223,10 @@ public class Party extends WeightedNamedObject {
 
         public int effort() {
             return questEffort;
+        }
+
+        public int completionDate() {
+            return completionDate;
         }
     }
 }

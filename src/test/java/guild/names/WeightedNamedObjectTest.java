@@ -30,7 +30,7 @@ class WeightedNamedObjectTest {
 
     private static Party buildRandomParty() {
         return new Party(
-                RandUtil.randCountOf(() -> Adventurer.randomise().build(), 7),
+                RandUtil.randCountOf(() -> Adventurer.randomise(0).build(), 7),
                 null
         );
     }

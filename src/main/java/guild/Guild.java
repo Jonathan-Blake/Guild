@@ -11,10 +11,12 @@ import java.util.List;
 
 public class Guild {
     private static final Logger logger = LoggerFactory.getLogger(Guild.class);
+    private static final int WEEKLY_DUE = 1;
 
     QuestBoard questBoard;
     AdventurerRoster adventurerRoster;
     private int day;
+    private int guildBank;
 
     public Guild() {
         day = 1;
@@ -31,13 +33,16 @@ public class Guild {
             g.selectDaytimeActivity();
             //Day End
             g.endDay();
+            if (g.day % 365 == 0) {
+                logger.info("Year Complete");
+            }
         }
     }
 
     private void newDay() {
         questBoard.removeOldQuests(day);
         questBoard.generateNewQuests(day);
-        adventurerRoster.generateNewHeros();
+        adventurerRoster.generateNewHeros(day);
         adventurerRoster.mergeOrSplitParties();
     }
 
@@ -47,9 +52,10 @@ public class Guild {
     }
 
     private void endDay() {
-        questBoard.checkCompletedQuests(day);
+        questBoard.resolveAcceptedQuestsForCompletion(day);
+        guildBank += adventurerRoster.collectDues(day, WEEKLY_DUE);
         logger.info("{}  Active Parties: {}   Active Heros: {}", day, adventurerRoster.getParties().size(), adventurerRoster.getMembers().size());
-        logger.info("Wealth Stats: {}", adventurerRoster.getMembers().stream().mapToInt(Adventurer::wealth).summaryStatistics());
+        logger.info("Adventurer Wealth Stats: {}  GuildWealth: {}", adventurerRoster.getMembers().stream().mapToInt(Adventurer::wealth).summaryStatistics(), guildBank);
         logger.info("Level Stats: {}", adventurerRoster.getMembers().stream().mapToInt(Adventurer::level).summaryStatistics());
 
         adventurerRoster.rest();

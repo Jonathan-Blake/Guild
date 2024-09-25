@@ -10,22 +10,48 @@ import java.util.List;
 public class Adventurer extends BasicNamedObject {
     private static final Logger logger = LoggerFactory.getLogger(Adventurer.class);
     private final AdventurePreferences preferences;
+    protected int partyDesperation = 0;
     private int power;
     private Party party;
     private int wealth = 0;
     private int injuries;
     private Integer dateInjured = 0;
     private int xp = 0;
-    private int partyDesperation = 0;
+    private int duesDateOwed;
 
     Adventurer(AdventurePreferences preferences) {
         super();
         this.preferences = preferences;
         power = 1;
+        setDuesDateOwed(preferences.creationDate() + 14);
     }
 
-    public static AdventurerBuilder randomise() {
-        return new AdventurerBuilder();
+    public static AdventurerBuilder randomise(int date) {
+        return new AdventurerBuilder(date);
+    }
+
+
+    public Party getParty() {
+        return party;
+    }
+
+    public void setParty(Party party) {
+        this.party = party;
+        if (party != null) {
+            this.partyDesperation = 0;
+        }
+    }
+
+    public void increaseDesperation() {
+        this.partyDesperation++;
+    }
+
+    public int getDuesDateOwed() {
+        return duesDateOwed;
+    }
+
+    public void setDuesDateOwed(int duesDateOwed) {
+        this.duesDateOwed = duesDateOwed;
     }
 
     public boolean outOfParty() {
@@ -58,19 +84,22 @@ public class Adventurer extends BasicNamedObject {
         return power;
     }
 
-    public void gainReward(int i) {
-        this.wealth += i;
-    }
-
     public int wealth() {
         return this.wealth;
     }
 
-    public void injure() {
-        this.injuries += 1;
-        this.dateInjured += this.injuries * 4;
+    public void gainReward(int i) {
+        this.wealth += i;
     }
 
+    public boolean charge(int amount) {
+        if (amount > wealth) {
+            return false;
+        } else {
+            wealth -= amount;
+            return true;
+        }
+    }
 
     public int injuriesSustained() {
         return this.injuries;
@@ -78,6 +107,11 @@ public class Adventurer extends BasicNamedObject {
 
     public boolean isDead() {
         return this.injuries > 3;
+    }
+
+    public void injure() {
+        this.injuries += 1;
+        this.dateInjured += this.injuries * 4;
     }
 
     @Override
@@ -102,18 +136,5 @@ public class Adventurer extends BasicNamedObject {
             this.xp -= level() * 4;
             power++;
         }
-    }
-
-    public void increaseDesperation() {
-        this.partyDesperation++;
-    }
-
-    public Party getParty() {
-        return party;
-    }
-
-    public void setParty(Party party) {
-        this.party = party;
-        this.partyDesperation = 0;
     }
 }

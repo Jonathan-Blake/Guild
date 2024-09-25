@@ -46,12 +46,19 @@ public class Quest extends WeightedNamedObject {
         return !contractsAccepted.keySet().isEmpty();
     }
 
-    public void accept(Party.QuestPlan party, Integer completionDate) {
+    public boolean accept(Party.QuestPlan party) {
         logger.info("{} was accepted by {}", this, party.getParty());
-        this.contractsAccepted.merge(completionDate, new ArrayList<>(List.of(party)), (o, n) -> {
-            o.addAll(n);
-            return o;
-        });
+        final int completionDate = party.completionDate();
+        if (completionDate < this.expiryDate) {
+            this.contractsAccepted.merge(completionDate, new ArrayList<>(List.of(party)), (o, n) -> {
+                o.addAll(n);
+                return o;
+            });
+            return true;
+        } else {
+            logger.warn("{} submitted Plan for {} too late.", party.getParty(), this);
+        }
+        return false;
     }
 
     public void resolve(int day) {
