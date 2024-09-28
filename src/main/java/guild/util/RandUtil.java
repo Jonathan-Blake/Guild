@@ -56,4 +56,8 @@ public class RandUtil {
         }
         return ret;
     }
+
+    public static int nextInt(int start, int limit) {
+        return random.nextInt(start, limit);
+    }
 }

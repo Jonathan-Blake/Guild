@@ -49,10 +49,18 @@ public abstract class BasicNamedObject extends BaseNamedObject {
         PARTY("[GROUP_DESCRIPTOR] the [ITEM]", "[DEED]ers", "[GROUP_DESCRIPTOR] [NAME]"),
         ADVENTURER("[NAME] the [TITLE]", "[CREATURE_DESCRIPTOR] [NAME]", "[NAME]", "[NAME] of [LOCATION]"),
         QUEST("Exterminate [MONSTER_TARGET]", "Seek [ITEM]", "Escort [NAME] to [LOCATION]"),
+        RECURRING_QUEST("Patrol [LOCATION] for [MONSTER]s", "Explore the [DUNGEON_NAME]", "Gather [INGREDIENTS] for [NAME]"),
         DEED("[MONSTER]-slay", "[ITEM] seek", "[LOCATION] seek"),
+
+        DUNGEON_NAME("[DUNGEON_TYPE] of [NAME_OR_LOCATION]", "[LOCATION]'s [DUNGEON_TYPE]", "[MONSTER] filled [DUNGEON_TYPE]"),
+        DUNGEON_TYPE("Tomb", "Caves", "Dungeon", "Barrow"),
+
+        INGREDIENTS("[MONSTER] parts", "Magical Herbs", "Magical Ores", "Lumber", "[INGREDIENTS] and [INGREDIENTS]"),
 
         MONSTER_TARGET("a single [MONSTER]", "the [GROUP_DESCRIPTOR] [MONSTER]s", "the Tribe of [MONSTER]s", "[LOCATION]'s [MONSTER] infestation"),
         MONSTER("Sewer Rat", "Goblin", "Minotaur", "[CREATURE_DESCRIPTOR] [MONSTER]"),
+
+        NAME_OR_LOCATION("[NAME]", "[LOCATION]"),
 
         LOCATION("[LOCATION_PREFIX][LOCATION_SUFFIX]"),
         LOCATION_PREFIX("Bleak", "Storm", "Mourn", "Grim", "Lost", "Frost", "New", "Thorn", "Stone", "Rock",
@@ -79,9 +87,10 @@ public abstract class BasicNamedObject extends BaseNamedObject {
 
         COLOUR(Constants.COLOUR_DESCRIPTOR_STRING, "[COLOUR_DESCRIPTOR]ish", "[COLOUR_DESCRIPTOR]-[COLOUR]"),// Not Used
         COLOUR_DESCRIPTOR("Green", "Gray", "Red", "White", "Black", "Blue"),
-        OPTIONAL_PLURAL("", "s"),
+        OPTIONAL_PLURAL("", "s")
 
         ;
+
 
         private final String[] expansions;
         private final String symbol;

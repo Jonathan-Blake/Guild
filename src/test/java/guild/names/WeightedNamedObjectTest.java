@@ -21,11 +21,21 @@ class WeightedNamedObjectTest {
     private static final Logger logger = LoggerFactory.getLogger(WeightedNamedObjectTest.class);
     private static final List<Supplier<WeightedNamedObject>> templates = List.of(
             WeightedNamedObjectTest::buildRandomParty,
-            WeightedNamedObjectTest::buildRandomQuest
+            WeightedNamedObjectTest::buildRandomQuest,
+            WeightedNamedObjectTest::buildEndlessQuest,
+            WeightedNamedObjectTest::buildRecurringQuest
     );
 
     private static Quest buildRandomQuest() {
-        return Quest.randomQuest().build();
+        return Quest.randomQuest().notRecurring().build();
+    }
+
+    private static Quest buildRecurringQuest() {
+        return Quest.randomQuest().recurring().build();
+    }
+
+    private static Quest buildEndlessQuest() {
+        return Quest.randomQuest().endless().build();
     }
 
     private static Party buildRandomParty() {
@@ -41,7 +51,7 @@ class WeightedNamedObjectTest {
                 Stream.generate(() -> Arguments.of(
                                 template.get()
                         )
-                ).limit(20)
+                ).limit(300)
         ));
         return ret.build().flatMap(each -> each);
     }
@@ -49,7 +59,7 @@ class WeightedNamedObjectTest {
     @ParameterizedTest
     @MethodSource
     void getName(WeightedNamedObject a) {
-        logger.info(a.getName());
+        logger.info("{}", a);
         if (a instanceof Party p) {
             p.members().forEach(adventurer -> {
                 if (p.getName().contains(adventurer.getName())) {

@@ -10,7 +10,10 @@ import guild.util.RandUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Party extends WeightedNamedObject {
@@ -102,7 +105,7 @@ public class Party extends WeightedNamedObject {
         return this.partyMorale;
     }
 
-    public Collection<Adventurer> members() {
+    public List<Adventurer> members() {
         return this.members;
     }
 
@@ -116,9 +119,9 @@ public class Party extends WeightedNamedObject {
     }
 
     @Override
-    public Map<String, Map<String, Integer>> getContextMapping() {
-        Map<String, Map<String, Integer>> ret = super.getContextMapping();
-        ret.get("[NAME]").putAll(members.stream().collect(Collectors.toMap(
+    public Map<BasicNamedObject.ReplacementString, Map<String, Integer>> getContextMapping() {
+        Map<BasicNamedObject.ReplacementString, Map<String, Integer>> ret = super.getContextMapping();
+        ret.get(BasicNamedObject.ReplacementString.NAME).putAll(members.stream().collect(Collectors.toMap(
                 BaseNamedObject::getName,
                 member -> (50),
                 Integer::sum

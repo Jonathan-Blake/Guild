@@ -55,4 +55,8 @@ public class QuestBoard {
     public List<Quest> viewQuests() {
         return this.quests;
     }
+
+    public void specifyQuests(Quest... quests) {
+        this.quests.addAll(List.of(quests));
+    }
 }

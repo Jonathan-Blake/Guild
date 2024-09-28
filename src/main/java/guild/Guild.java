@@ -3,7 +3,9 @@ package guild;
 import guild.adventurer.Adventurer;
 import guild.adventurer.AdventurerRoster;
 import guild.adventurer.Party;
+import guild.quest.Quest;
 import guild.quest.QuestBoard;
+import guild.quest.QuestRank;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,6 +28,15 @@ public class Guild {
 
     public static void main(String[] args) {
         Guild g = new Guild();
+        g.questBoard.specifyQuests(
+                Quest.randomQuest()
+                        .endless()
+                        .difficulty(QuestRank.NORMAL)
+                        .build(),
+                Quest.randomQuest()
+                        .endless()
+                        .difficulty(QuestRank.VERYEASY)
+                        .build());
         while (true) {
             //DayStart
             g.newDay();

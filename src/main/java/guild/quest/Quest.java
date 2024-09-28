@@ -15,7 +15,7 @@ public class Quest extends WeightedNamedObject {
 
     final int expiryDate;
     private final QuestRank rank;
-    private int reward;
+    int reward;
     private HashMap<Integer, List<Party.QuestPlan>> contractsAccepted;
     private boolean completed = false;
 
@@ -49,7 +49,7 @@ public class Quest extends WeightedNamedObject {
     public boolean accept(Party.QuestPlan party) {
         logger.info("{} was accepted by {}", this, party.getParty());
         final int completionDate = party.completionDate();
-        if (completionDate < this.expiryDate) {
+        if (completionDate <= this.expiryDate) {
             this.contractsAccepted.merge(completionDate, new ArrayList<>(List.of(party)), (o, n) -> {
                 o.addAll(n);
                 return o;
@@ -92,24 +92,24 @@ public class Quest extends WeightedNamedObject {
     }
 
     @Override
-    public Map<String, Map<String, Integer>> getContextMapping() {
-        Map<String, Map<String, Integer>> ret = super.getContextMapping();
-        ret.get("[MONSTER]").putAll(QuestRank.getMonstersForRank(rank).stream().collect(Collectors.toMap(
+    public Map<BasicNamedObject.ReplacementString, Map<String, Integer>> getContextMapping() {
+        Map<BasicNamedObject.ReplacementString, Map<String, Integer>> ret = super.getContextMapping();
+        ret.get(BasicNamedObject.ReplacementString.MONSTER).putAll(QuestRank.getMonstersForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (25),
                 Integer::sum
         )));
-        ret.get("[ITEM_DESCRIPTOR]").putAll(QuestRank.getItemsForRank(rank).stream().collect(Collectors.toMap(
+        ret.get(BasicNamedObject.ReplacementString.ITEM_DESCRIPTOR).putAll(QuestRank.getItemsForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (15),
                 Integer::sum
         )));
-        ret.get("[MATERIAL_DESCRIPTOR]").putAll(QuestRank.getMaterialsForRank(rank).stream().collect(Collectors.toMap(
+        ret.get(BasicNamedObject.ReplacementString.MATERIAL_DESCRIPTOR).putAll(QuestRank.getMaterialsForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (15),
                 Integer::sum
         )));
-        ret.get("[GROUP_DESCRIPTOR]").putAll(QuestRank.getGroupForRank(rank).stream().collect(Collectors.toMap(
+        ret.get(BasicNamedObject.ReplacementString.GROUP_DESCRIPTOR).putAll(QuestRank.getGroupForRank(rank).stream().collect(Collectors.toMap(
                 string -> string,
                 member -> (15),
                 Integer::sum

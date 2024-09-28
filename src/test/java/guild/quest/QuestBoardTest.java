@@ -13,16 +13,20 @@ class QuestBoardTest {
         QuestBoard questBoard = new QuestBoard();
         questBoard.generateNewQuests(0);
         questBoard.removeOldQuests(100);
-        assertTrue(questBoard.quests.isEmpty());
+        assertTrue(questBoard.viewQuests().isEmpty(), "Expected quests to be empty but where " + questBoard.viewQuests());
     }
 
     @Test
     void removeCompletedQuests() {
         QuestBoard questBoard = new QuestBoard();
         questBoard.generateNewQuests(0);
-        questBoard.quests.forEach(Quest::complete);
+        questBoard.quests.forEach(each -> {
+            while (!each.isCompleted()) {
+                each.complete();// Handle multi attempt quests
+            }
+        });
         questBoard.removeOldQuests(0);
-        assertTrue(questBoard.quests.isEmpty());
+        assertTrue(questBoard.viewQuests().isEmpty(), "Expected quests to be empty but where " + questBoard.viewQuests());
     }
 
     @Nested

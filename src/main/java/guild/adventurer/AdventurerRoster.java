@@ -113,7 +113,7 @@ public class AdventurerRoster {
     }
 
     public void disband(Party party) {
-        logger.warn("{} disbanded.", party);
+        logger.warn("{} decided to go their own ways.", party.members());
         for (Adventurer member : new ArrayList<>(party.members())) {
             party.removeMember(member);
         }

@@ -30,7 +30,10 @@ class QuestTest {
                         Adventurer.randomise(0).build()
                 )),// Enough to guarentee complete?
                 null);
-        Quest q = Quest.randomQuest().notDifficulty(QuestRank.HARD)
+        Quest q = Quest.randomQuest()
+                .notRecurring()
+                .notDifficulty(QuestRank.HARD)
+                .notRecurring()
                 .notDifficulty(QuestRank.LEGENDARY)
                 .notDifficulty(QuestRank.NORMAL)
                 .build();
