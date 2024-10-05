@@ -6,6 +6,7 @@ import guild.adventurer.Party;
 import guild.quest.Quest;
 import guild.quest.QuestBoard;
 import guild.quest.QuestRank;
+import guild.shop.Shop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,7 +60,14 @@ public class Guild {
 
     private void selectDaytimeActivity() {
         List<Party> parties = adventurerRoster.getUnassignedParties();
-        parties.forEach(party -> party.selectQuest(questBoard, day));
+        parties.forEach(party -> {
+            switch (party.voteOnDay()) {
+                case "QUEST" -> party.selectQuest(questBoard, day);
+                case "SHOP" -> party.members().forEach(Shop::browse);
+                case "REST" -> party.members().forEach(Adventurer::rest);
+                default -> throw new IllegalArgumentException("Unknown Activity");
+            }
+        });
     }
 
     private void endDay() {

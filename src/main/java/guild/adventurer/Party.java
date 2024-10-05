@@ -67,7 +67,7 @@ public class Party extends WeightedNamedObject {
     }
 
     public void divideReward(int amount) {
-        this.partyMorale += currentQuest().rank().ordinal() + 1;
+        this.partyMorale = Math.min(20, this.partyMorale + currentQuest().rank().ordinal() + 1);
         int remainder = amount % members.size();
         int split = amount / members.size();
         members.forEach(each -> each.gainReward(split));
@@ -98,7 +98,7 @@ public class Party extends WeightedNamedObject {
     }
 
     public int partyPower() {
-        return members.stream().mapToInt(Adventurer::level).sum();
+        return members.stream().mapToInt(each -> each.level() + each.getGear()).sum();
     }
 
     public int partyMorale() {
@@ -137,6 +137,24 @@ public class Party extends WeightedNamedObject {
         if (members.isEmpty()) {
             logger.info("{} disbanded due to lack of members.", this);
             roster.getParties().remove(this);
+        }
+    }
+
+    public String voteOnDay() {
+        StringBuilder sb = new StringBuilder(this + " decided today they would ");
+        try {
+            return members.stream()
+                    .collect(Collectors.toMap(
+                            Adventurer::preferredDayActivity,
+                            each -> 1,
+                            Integer::sum
+                    )).entrySet().stream()
+                    .peek(each -> sb.append("votes for ").append(each.getKey()).append(" : ").append(each.getValue()))
+                    .max(Comparator.comparingInt(Map.Entry::getValue))
+                    .map(Map.Entry::getKey)
+                    .orElseThrow();
+        } finally {
+            logger.info(sb.toString());
         }
     }
 

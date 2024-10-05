@@ -183,4 +183,19 @@ class PartyTest {
             assertEquals(4, build3.wealth());
         }
     }
+
+    @Test
+    void voteOnDay() {
+        Adventurer m1 = mock(Adventurer.class);
+        when(m1.preferredDayActivity()).thenReturn("1");
+        Adventurer m2 = mock(Adventurer.class);
+        when(m2.preferredDayActivity()).thenReturn("2");
+        Adventurer m3 = mock(Adventurer.class);
+        when(m3.preferredDayActivity()).thenReturn("3");
+        Adventurer m4 = mock(Adventurer.class);
+        when(m4.preferredDayActivity()).thenReturn("3");
+        Party p = new Party(List.of(m1, m2, m3, m4), null);
+        assertEquals("3", p.voteOnDay());
+        List.of(m1, m2, m3, m4).forEach(each -> verify(each).preferredDayActivity());
+    }
 }

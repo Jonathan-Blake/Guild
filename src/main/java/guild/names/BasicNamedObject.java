@@ -26,6 +26,16 @@ public abstract class BasicNamedObject extends BaseNamedObject {
         return temp;
     }
 
+    public static String generateString(ReplacementString template) {
+        return new WeightedNamedObject() {
+
+            @Override
+            public String getNameTemplate() {
+                return template.getSymbol();
+            }
+        }.getName();
+    }
+
     @Override
     protected String initName() {
         var ref = new Object() {

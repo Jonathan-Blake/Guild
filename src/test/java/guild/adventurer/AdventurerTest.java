@@ -12,6 +12,30 @@ import static org.mockito.Mockito.mock;
 class AdventurerTest {
 
     @Nested
+    class preferredDayActivity {
+        @Test
+        void votesQuestIfNoConditions() {
+            Adventurer a = Adventurer.randomise(0).build();
+            assertEquals("QUEST", a.preferredDayActivity());
+        }
+
+        @Test
+        void votesShopIfHasFunds() {
+            Adventurer a = Adventurer.randomise(0).build();
+            a.gainReward(1000);
+            assertEquals("SHOP", a.preferredDayActivity());
+        }
+
+        @Test
+        void votesRestIfInjured() {
+            Adventurer a = Adventurer.randomise(0).build();
+            a.gainReward(1000);
+            a.injure();
+            assertEquals("REST", a.preferredDayActivity());
+        }
+    }
+
+    @Nested
     class wealth {
         @Test
         void gainsWealthCorrectly() {

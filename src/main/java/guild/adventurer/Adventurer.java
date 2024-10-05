@@ -1,6 +1,7 @@
 package guild.adventurer;
 
 import guild.names.BasicNamedObject;
+import guild.shop.Shop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +19,13 @@ public class Adventurer extends BasicNamedObject {
     private Integer dateInjured = 0;
     private int xp = 0;
     private int duesDateOwed;
+    private int gear;
 
     Adventurer(AdventurePreferences preferences) {
         super();
         this.preferences = preferences;
         power = 1;
+        gear = 1;
         setDuesDateOwed(preferences.creationDate() + 14);
     }
 
@@ -136,5 +139,23 @@ public class Adventurer extends BasicNamedObject {
             this.xp -= level() * 4;
             power++;
         }
+    }
+
+    public String preferredDayActivity() {
+        if (injuriesSustained() > 0) {
+            return "REST";
+        } else if (wealth() > Shop.calculateCostOfUpgrade(this)) {
+            return "SHOP";
+        } else {
+            return "QUEST";
+        }
+    }
+
+    public int getGear() {
+        return this.gear;
+    }
+
+    public void improveGear() {
+        this.gear += 1;
     }
 }
