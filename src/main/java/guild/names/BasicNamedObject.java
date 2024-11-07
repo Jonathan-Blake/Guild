@@ -12,17 +12,14 @@ public abstract class BasicNamedObject extends BaseNamedObject {
     private static final EnumSet<ReplacementString> replacements = EnumSet.allOf(ReplacementString.class);
 
     public static String replaceTemplatedStrings(String temp, Integer attempts, ReplacementString each) {
-        final String[] expansions = each.expansions();
+        List<String> expansions = new ArrayList<>(List.of(each.expansions()));
         if (attempts > 2) {
-            List<String> expansionsWithoutRecursion = ListUtil.removeIf(new ArrayList<>(List.of(each.expansions)), (replacementString -> replacementString.contains("[")));
-            if (expansionsWithoutRecursion.isEmpty()) {
-                temp = temp.replace(each.getSymbol(), RandUtil.pick(expansions));
-            } else {
-                temp = temp.replace(each.getSymbol(), RandUtil.pick(expansionsWithoutRecursion));
+            List<String> expansionsWithoutRecursion = ListUtil.removeIf(expansions, (replacementString -> replacementString.contains("[")));
+            if (!expansionsWithoutRecursion.isEmpty()) {
+                expansions = expansionsWithoutRecursion;
             }
-        } else {
-            temp = temp.replace(each.getSymbol(), RandUtil.pick(expansions));
         }
+        temp = temp.replace(each.getSymbol(), RandUtil.pick(expansions));
         return temp;
     }
 
